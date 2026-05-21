@@ -6,7 +6,7 @@ import Profile from "./views/Profile";
 import ResponsiveAppBar from "./components/AppBar";
 import Admin from "./views/Admin";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function AppLayout() {
   const location = useLocation();
