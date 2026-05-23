@@ -2,21 +2,27 @@ import React from "react";
 import Add from "../components/Add";
 import User from "../components/User";
 
-const Admin = ({ addUser, users, delUser }) => {
+const Admin = ({ addUser, users, delUser, updateUser }) => {
   return (
     <>
       <Add addUser={addUser} />
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Name</th>
             <th>Username</th>
-            <th>Delete?</th>
+            <th>Role</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <User key={user._id} user={user} delUser={delUser} />
+            <User
+              key={user._id}
+              user={user}
+              delUser={delUser}
+              updateUser={updateUser}
+            />
           ))}
         </tbody>
       </table>

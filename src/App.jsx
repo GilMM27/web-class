@@ -13,43 +13,60 @@ function AppLayout() {
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
+  const [token, setToken] = useState(null);
+
   useEffect(() => {
-    if (true) {
+    if (isLogin && token && user?.role === "admin") {
       const getUsers = async () => {
-        const res = await fetch(`${API_URL}/users`);
+        const res = await fetch(`${API_URL}/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await res.json();
         setUsers(data);
       };
       getUsers();
     }
-  }, [isLogin]);
+  }, [isLogin, token, user]);
 
-  const login = async (user) => {
+  const login = async (userCredentials) => {
+    console.log("Attempting login for:", userCredentials.username);
     const res = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(user),
+      body: JSON.stringify(userCredentials),
     });
     const data = await res.json();
-    setIsLogin(data.login);
-    setUser(data.user);
+    console.log("Login response:", data);
+    if (data.login) {
+      setIsLogin(true);
+      setUser(data.user);
+      setToken(data.token);
+    }
     return data;
   };
 
   const delUser = async (id) => {
+    console.log("Deleting user:", id);
     await fetch(`${API_URL}/users/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     setUsers(users.filter((u) => u._id !== id));
   };
 
   const addUser = async (newUser) => {
+    console.log("Adding user:", newUser.username);
     const res = await fetch(`${API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(newUser),
     });
@@ -57,16 +74,42 @@ function AppLayout() {
     setUsers([...users, data]);
   };
 
+  const updateUser = async (id, updatedUser) => {
+    console.log("Updating user:", id, updatedUser);
+    const res = await fetch(`${API_URL}/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedUser),
+    });
+    const data = await res.json();
+    console.log("Update response:", data);
+    setUsers(users.map((u) => (u._id === id ? data : u)));
+  };
+
   return (
     <>
-      {isLogin && <ResponsiveAppBar />}
+      {isLogin && <ResponsiveAppBar user={user} />}
       <Routes>
         <Route path="/" element={<Login login={login} />} />
         <Route path="/profile" element={<Profile user={user} />} />
-        <Route
-          path="/admin"
-          element={<Admin addUser={addUser} users={users} delUser={delUser} />}
-        />
+        {user?.role === "admin" ? (
+          <Route
+            path="/admin"
+            element={
+              <Admin
+                addUser={addUser}
+                users={users}
+                delUser={delUser}
+                updateUser={updateUser}
+              />
+            }
+          />
+        ) : (
+          <Route path="/admin" element={<Profile user={user} />} />
+        )}
       </Routes>
     </>
   );
