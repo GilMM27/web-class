@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const User = ({ user, delUser, updateUser }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -33,7 +34,10 @@ const User = ({ user, delUser, updateUser }) => {
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </td>
         <td>
-          <input value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
         </td>
         <td>
           <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -57,6 +61,9 @@ const User = ({ user, delUser, updateUser }) => {
 
   return (
     <tr>
+      <td>
+        <Link to={`/users/${user._id}?react=889`}>{user._id}</Link>
+      </td>
       <td>{user.name}</td>
       <td>{user.username}</td>
       <td>{user.role}</td>

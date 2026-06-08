@@ -5,10 +5,13 @@ import Login from "./views/Login";
 import Profile from "./views/Profile";
 import ResponsiveAppBar from "./components/AppBar";
 import Admin from "./views/Admin";
+import Details from "./components/Details";
+import LifeCycle from "./components/LifeCycle";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function AppLayout() {
+  const [show, setShow] = useState(false);
   const location = useLocation();
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState(null);
@@ -110,7 +113,10 @@ function AppLayout() {
         ) : (
           <Route path="/admin" element={<Profile user={user} />} />
         )}
+        <Route path="/users/:username" element={<Details users={users} />} />
       </Routes>
+      <button onClick={() => setShow(!show)}>{show ? "hide" : "show"}</button>
+      {show && <LifeCycle />}
     </>
   );
 }
